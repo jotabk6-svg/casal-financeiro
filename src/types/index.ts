@@ -1,70 +1,38 @@
 export type Usuario = 'JACSON' | 'MANUELI'
-export type MetodoPagamento = 'DINHEIRO' | 'CARTAO' | 'PIX'
-export type Situacao = 'PAGO' | 'PENDENTE'
+export type TipoTransacao = 'RECEITA' | 'DESPESA'
+export type StatusTransacao = 'PAGO' | 'PENDENTE'
 
-export interface Despesa {
+export interface Transacao {
   id: string
   usuario: Usuario
-  data: string
-  categoria: string
+  tipo: TipoTransacao
   valor: number
-  metodoPagamento: MetodoPagamento
-  situacao: Situacao
-  isFixo: boolean
-  descricao: string | null
+  categoria: string
+  data: string
+  status: StatusTransacao
+  descricao?: string | null
   createdAt: string
 }
 
-export interface Receita {
-  id: string
+export interface TransacaoInput {
   usuario: Usuario
-  data: string
-  tipo: string
+  tipo: TipoTransacao
   valor: number
-  descricao: string | null
-  createdAt: string
-}
-
-export interface DespesaInput {
-  usuario: Usuario
-  data: string
   categoria: string
-  valor: number
-  metodoPagamento: MetodoPagamento
-  situacao: Situacao
-  isFixo: boolean
-  descricao?: string
-}
-
-export interface ReceitaInput {
-  usuario: Usuario
   data: string
-  tipo: string
-  valor: number
+  status: StatusTransacao
   descricao?: string
 }
 
-export interface DashboardStats {
+export interface ResumoMes {
   totalReceitas: number
   totalDespesas: number
-  totalPago: number
   totalPendente: number
   saldo: number
-  receitaJacson: number
-  receitaManueli: number
-  despesaJacson: number
-  despesaManueli: number
-  categorias: { categoria: string; total: number }[]
-  recentes: RecenteItem[]
 }
 
-export interface RecenteItem {
-  id: string
-  tipo: 'despesa' | 'receita'
-  descricao: string
-  categoria: string
-  valor: number
-  data: string
-  usuario: Usuario
-  situacao?: Situacao
+export interface MesData {
+  label: string
+  receitas: number
+  despesas: number
 }

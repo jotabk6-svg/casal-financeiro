@@ -7,25 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Despesa {
-  id              String   @id @default(cuid())
-  usuario         String   // JACSON | MANUELI
-  data            DateTime
-  categoria       String
-  valor           Decimal
-  metodoPagamento String   // DINHEIRO | CARTAO | PIX
-  situacao        String   // PAGO | PENDENTE
-  isFixo          Boolean  @default(false)
-  descricao       String?
-  createdAt       DateTime @default(now())
-}
-
-model Receita {
+model Transacao {
   id        String   @id @default(cuid())
   usuario   String   // JACSON | MANUELI
-  data      DateTime
-  tipo      String
+  tipo      String   // RECEITA | DESPESA
   valor     Decimal
+  categoria String
+  data      DateTime
+  status    String   // PAGO | PENDENTE
   descricao String?
   createdAt DateTime @default(now())
 }

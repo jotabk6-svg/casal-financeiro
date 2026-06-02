@@ -36,14 +36,14 @@ export function MonthSelector({ year, month }: MonthSelectorProps) {
   const label = format(new Date(year, month - 1, 1), 'MMM yyyy', { locale: ptBR })
 
   return (
-    <div className="flex items-center gap-1 rounded-md border border-border bg-transparent">
-      <Button variant="ghost" size="icon" onClick={prev} className="h-8 w-8 rounded-r-none">
+    <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <Button variant="ghost" size="icon" onClick={prev} className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-700">
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      <span className="min-w-[90px] text-center text-sm font-medium capitalize text-foreground">
+      <span className="min-w-[90px] text-center text-sm font-semibold capitalize text-slate-700">
         {label}
       </span>
-      <Button variant="ghost" size="icon" onClick={next} className="h-8 w-8 rounded-l-none">
+      <Button variant="ghost" size="icon" onClick={next} className="h-8 w-8 rounded-lg text-slate-500 hover:text-slate-700">
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>

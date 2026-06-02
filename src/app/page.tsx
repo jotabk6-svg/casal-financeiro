@@ -1,11 +1,10 @@
 import { prisma } from '@/lib/prisma'
-import { getCurrentYearMonth, getMonthRange, formatMonthYear } from '@/lib/utils'
-import { StatsCards } from '@/components/dashboard/stats-cards'
-import { UserComparison } from '@/components/dashboard/user-comparison'
-import { CategoryBreakdown } from '@/components/dashboard/category-breakdown'
-import { RecentTransactions } from '@/components/dashboard/recent-transactions'
+import { getCurrentYearMonth, getMonthRange, formatMonthYear, MESES_CURTOS } from '@/lib/utils'
+import { SummaryCards } from '@/components/dashboard/summary-cards'
+import { CashflowChart } from '@/components/dashboard/cashflow-chart'
+import { ActivityFeed } from '@/components/dashboard/activity-feed'
 import { MonthSelector } from '@/components/month-selector'
-import type { RecenteItem } from '@/types'
+import type { Transacao, MesData } from '@/types'
 
 interface PageProps {
   searchParams: Promise<{ month?: string; year?: string }>
@@ -20,89 +19,71 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   const { start, end } = getMonthRange(year, month)
 
-  const [despesas, receitas] = await Promise.all([
-    prisma.despesa.findMany({ where: { data: { gte: start, lte: end } } }),
-    prisma.receita.findMany({ where: { data: { gte: start, lte: end } } }),
-  ])
+  // Current month transactions
+  const transacoes = await prisma.transacao.findMany({
+    where: { data: { gte: start, lte: end } },
+    orderBy: { data: 'desc' },
+  })
 
-  // Totais
-  const totalReceitas = receitas.reduce((s, r) => s + r.valor.toNumber(), 0)
-  const totalDespesas = despesas.reduce((s, d) => s + d.valor.toNumber(), 0)
-  const totalPendente = despesas.filter((d) => d.situacao === 'PENDENTE').reduce((s, d) => s + d.valor.toNumber(), 0)
+  // Last 6 months for chart
+  const mesesData: MesData[] = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(year, month - 1 - i, 1)
+    const { start: s, end: e } = getMonthRange(d.getFullYear(), d.getMonth() + 1)
+    const txs = await prisma.transacao.findMany({ where: { data: { gte: s, lte: e } } })
+    mesesData.push({
+      label: MESES_CURTOS[d.getMonth()],
+      receitas: txs.filter((t) => t.tipo === 'RECEITA').reduce((acc, t) => acc + t.valor.toNumber(), 0),
+      despesas: txs.filter((t) => t.tipo === 'DESPESA').reduce((acc, t) => acc + t.valor.toNumber(), 0),
+    })
+  }
+
+  const receitas = transacoes.filter((t) => t.tipo === 'RECEITA')
+  const despesas = transacoes.filter((t) => t.tipo === 'DESPESA')
+
+  const totalReceitas = receitas.reduce((s, t) => s + t.valor.toNumber(), 0)
+  const totalDespesas = despesas.reduce((s, t) => s + t.valor.toNumber(), 0)
+  const totalPendente = despesas.filter((t) => t.status === 'PENDENTE').reduce((s, t) => s + t.valor.toNumber(), 0)
   const saldo = totalReceitas - totalDespesas
 
-  // Por usuário
-  const receitaJacson = receitas.filter((r) => r.usuario === 'JACSON').reduce((s, r) => s + r.valor.toNumber(), 0)
-  const receitaManueli = receitas.filter((r) => r.usuario === 'MANUELI').reduce((s, r) => s + r.valor.toNumber(), 0)
-  const despesaJacson = despesas.filter((d) => d.usuario === 'JACSON').reduce((s, d) => s + d.valor.toNumber(), 0)
-  const despesaManueli = despesas.filter((d) => d.usuario === 'MANUELI').reduce((s, d) => s + d.valor.toNumber(), 0)
-
-  // Por categoria
-  const categoriaMap = new Map<string, number>()
-  for (const d of despesas) {
-    categoriaMap.set(d.categoria, (categoriaMap.get(d.categoria) ?? 0) + d.valor.toNumber())
-  }
-  const categorias = Array.from(categoriaMap.entries()).map(([categoria, total]) => ({ categoria, total }))
-
-  // Transações recentes (10 mais recentes entre despesas e receitas)
-  const recentes: RecenteItem[] = [
-    ...despesas.map((d) => ({
-      id: d.id,
-      tipo: 'despesa' as const,
-      descricao: d.descricao ?? '',
-      categoria: d.categoria,
-      valor: d.valor.toNumber(),
-      data: d.data.toISOString(),
-      usuario: d.usuario as RecenteItem['usuario'],
-      situacao: d.situacao as RecenteItem['situacao'],
-    })),
-    ...receitas.map((r) => ({
-      id: r.id,
-      tipo: 'receita' as const,
-      descricao: r.descricao ?? '',
-      categoria: r.tipo,
-      valor: r.valor.toNumber(),
-      data: r.data.toISOString(),
-      usuario: r.usuario as RecenteItem['usuario'],
-    })),
-  ]
-    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-    .slice(0, 10)
+  const recentes: Transacao[] = transacoes.slice(0, 10).map((t) => ({
+    id: t.id,
+    usuario: t.usuario as Transacao['usuario'],
+    tipo: t.tipo as Transacao['tipo'],
+    valor: t.valor.toNumber(),
+    categoria: t.categoria,
+    data: t.data.toISOString(),
+    status: t.status as Transacao['status'],
+    descricao: t.descricao,
+    createdAt: t.createdAt.toISOString(),
+  }))
 
   const mesLabel = formatMonthYear(new Date(year, month - 1, 1))
 
   return (
-    <div className="p-4 md:p-6 space-y-6 animate-fade-in">
+    <div className="p-4 md:p-6 space-y-4 md:space-y-5">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground capitalize">{mesLabel}</p>
+          <h1 className="text-lg font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm capitalize text-slate-500">{mesLabel}</p>
         </div>
         <MonthSelector year={year} month={month} />
       </div>
 
-      {/* Stats */}
-      <StatsCards
+      {/* Summary cards */}
+      <SummaryCards
         totalReceitas={totalReceitas}
         totalDespesas={totalDespesas}
         totalPendente={totalPendente}
         saldo={saldo}
       />
 
-      {/* Grid: Comparativo + Categorias */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <UserComparison
-          receitaJacson={receitaJacson}
-          receitaManueli={receitaManueli}
-          despesaJacson={despesaJacson}
-          despesaManueli={despesaManueli}
-        />
-        <CategoryBreakdown categorias={categorias} totalDespesas={totalDespesas} />
-      </div>
+      {/* Cashflow chart */}
+      <CashflowChart meses={mesesData} />
 
-      {/* Recentes */}
-      <RecentTransactions recentes={recentes} />
+      {/* Activity feed */}
+      <ActivityFeed transacoes={recentes} />
     </div>
   )
 }

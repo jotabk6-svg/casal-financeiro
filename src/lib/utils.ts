@@ -44,7 +44,6 @@ export const CATEGORIAS_DESPESA = [
   'Alimentação',
   'Beleza',
   'Educação',
-  'Investimentos',
   'Lazer',
   'Moradia',
   'Pets',
@@ -56,7 +55,7 @@ export const CATEGORIAS_DESPESA = [
   'Outros',
 ] as const
 
-export const TIPOS_RECEITA = [
+export const CATEGORIAS_RECEITA = [
   'Salário',
   'Freelance',
   'Investimentos',
@@ -77,5 +76,10 @@ export const CATEGORIA_CORES: Record<string, string> = {
   Tecnologia: '#3b82f6',
   Transporte: '#84cc16',
   Vestuário: '#e879f9',
+  Salário: '#16a34a',
+  Freelance: '#0ea5e9',
+  Aluguel: '#a855f7',
   Outros: '#71717a',
 }
+
+export const MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']

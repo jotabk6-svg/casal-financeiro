@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const usuario = cookieStore.get('casal_user')?.value ?? null
 
   return (
-    <html lang="pt-BR" className="dark">
+    <html lang="pt-BR">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
         {usuario ? (
           <AppShell usuario={usuario}>{children}</AppShell>
