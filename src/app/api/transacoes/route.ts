@@ -39,6 +39,7 @@ export async function POST(req: Request) {
       categoria,
       data: new Date(data),
       status: tipo === 'RECEITA' ? 'PAGO' : status,
+      isFixo: tipo === 'DESPESA' ? (body.isFixo ?? false) : false,
       descricao: descricao || null,
     },
   })

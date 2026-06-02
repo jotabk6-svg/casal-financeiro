@@ -42,6 +42,7 @@ export default async function ExtratoPage({ searchParams }: PageProps) {
     categoria: t.categoria,
     data: t.data.toISOString(),
     status: t.status as Transacao['status'],
+    isFixo: t.isFixo,
     descricao: t.descricao,
     createdAt: t.createdAt.toISOString(),
   }))

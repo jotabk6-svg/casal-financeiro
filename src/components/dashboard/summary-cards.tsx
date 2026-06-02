@@ -9,59 +9,63 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ totalReceitas, totalDespesas, totalPendente, saldo }: SummaryCardsProps) {
-  const cards = [
-    {
-      label: 'Saldo do mês',
-      value: saldo,
-      icon: Wallet,
-      color: saldo >= 0 ? 'text-emerald-600' : 'text-red-500',
-      iconBg: saldo >= 0 ? 'bg-emerald-100' : 'bg-red-100',
-      iconColor: saldo >= 0 ? 'text-emerald-600' : 'text-red-500',
-      valueColor: saldo >= 0 ? 'text-emerald-700' : 'text-red-600',
-    },
-    {
-      label: 'Receitas',
-      value: totalReceitas,
-      icon: TrendingUp,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-      valueColor: 'text-slate-900',
-    },
-    {
-      label: 'Despesas',
-      value: totalDespesas,
-      icon: TrendingDown,
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-500',
-      valueColor: 'text-slate-900',
-    },
-    {
-      label: 'Pendente',
-      value: totalPendente,
-      icon: Clock,
-      iconBg: 'bg-amber-100',
-      iconColor: 'text-amber-600',
-      valueColor: 'text-slate-900',
-    },
-  ]
+  const isPositive = saldo >= 0
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {cards.map(({ label, value, icon: Icon, iconBg, iconColor, valueColor }) => (
-        <div key={label} className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
-          <div className="flex items-start justify-between">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}>
-              <Icon className={`h-5 w-5 ${iconColor}`} />
-            </div>
-          </div>
-          <div className="mt-4">
-            <p className="text-xs font-medium text-slate-500">{label}</p>
-            <p className={`mt-1 text-xl font-bold ${valueColor}`}>
-              {formatCurrency(value)}
-            </p>
+      {/* Saldo — card destacado com fundo verde */}
+      <div className={`rounded-2xl p-5 shadow-sm col-span-2 lg:col-span-1 ${isPositive ? 'bg-emerald-600' : 'bg-red-500'}`}>
+        <div className="flex items-start justify-between">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
+            <Wallet className="h-5 w-5 text-white" />
           </div>
         </div>
-      ))}
+        <div className="mt-4">
+          <p className="text-xs font-medium text-white/70">Saldo do mês</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight text-white">
+            {formatCurrency(saldo)}
+          </p>
+        </div>
+      </div>
+
+      {/* Receitas */}
+      <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+          <TrendingUp className="h-5 w-5 text-blue-600" />
+        </div>
+        <div className="mt-4">
+          <p className="text-xs font-medium text-slate-500">Receitas</p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            {formatCurrency(totalReceitas)}
+          </p>
+        </div>
+      </div>
+
+      {/* Despesas */}
+      <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
+          <TrendingDown className="h-5 w-5 text-red-500" />
+        </div>
+        <div className="mt-4">
+          <p className="text-xs font-medium text-slate-500">Despesas</p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            {formatCurrency(totalDespesas)}
+          </p>
+        </div>
+      </div>
+
+      {/* Pendente */}
+      <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
+          <Clock className="h-5 w-5 text-amber-600" />
+        </div>
+        <div className="mt-4">
+          <p className="text-xs font-medium text-slate-500">Pendente</p>
+          <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            {formatCurrency(totalPendente)}
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

@@ -83,3 +83,22 @@ export const CATEGORIA_CORES: Record<string, string> = {
 }
 
 export const MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+export function calcularAcerto(
+  transacoes: { usuario: string; tipo: string; valor: number }[]
+) {
+  const despesas = transacoes.filter((t) => t.tipo === 'DESPESA')
+  const jacson = despesas.filter((t) => t.usuario === 'JACSON').reduce((s, t) => s + t.valor, 0)
+  const manueli = despesas.filter((t) => t.usuario === 'MANUELI').reduce((s, t) => s + t.valor, 0)
+
+  if (jacson === manueli) {
+    return { equilibrado: true, valor: 0, quemPaga: null, quemRecebe: null, jacson, manueli }
+  }
+
+  const valor = Math.abs(jacson - manueli) / 2
+
+  if (jacson > manueli) {
+    return { equilibrado: false, valor, quemPaga: 'MANUELI' as const, quemRecebe: 'JACSON' as const, jacson, manueli }
+  }
+  return { equilibrado: false, valor, quemPaga: 'JACSON' as const, quemRecebe: 'MANUELI' as const, jacson, manueli }
+}

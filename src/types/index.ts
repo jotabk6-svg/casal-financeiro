@@ -10,6 +10,7 @@ export interface Transacao {
   categoria: string
   data: string
   status: StatusTransacao
+  isFixo: boolean
   descricao?: string | null
   createdAt: string
 }
@@ -21,6 +22,7 @@ export interface TransacaoInput {
   categoria: string
   data: string
   status: StatusTransacao
+  isFixo?: boolean
   descricao?: string
 }
 
@@ -35,4 +37,22 @@ export interface MesData {
   label: string
   receitas: number
   despesas: number
+}
+
+export interface Meta {
+  id: string
+  titulo: string
+  valorObjetivo: number
+  valorAtual: number
+  descricao?: string | null
+  createdAt: string
+}
+
+export interface AcertoContas {
+  equilibrado: boolean
+  valor: number
+  quemPaga: Usuario | null
+  quemRecebe: Usuario | null
+  jacson: number
+  manueli: number
 }
