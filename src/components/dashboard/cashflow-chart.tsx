@@ -12,8 +12,9 @@ function smoothPath(points: { x: number; y: number }[], close?: { bottom: number
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1]
     const curr = points[i]
-    const cpX = (prev.x + curr.x) / 2
-    d += ` C ${cpX} ${prev.y} ${cpX} ${curr.y} ${curr.x} ${curr.y}`
+    const dx = curr.x - prev.x
+    // Tension 0.35 — evita o S-exagerado em saltos grandes
+    d += ` C ${prev.x + dx * 0.35} ${prev.y} ${curr.x - dx * 0.35} ${curr.y} ${curr.x} ${curr.y}`
   }
   if (close) {
     d += ` L ${points[points.length - 1].x} ${close.bottom} L ${close.startX} ${close.bottom} Z`
@@ -61,7 +62,7 @@ export function CashflowChart({ meses }: CashflowChartProps) {
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 180 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
         <defs>
           <linearGradient id="gReceita" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
