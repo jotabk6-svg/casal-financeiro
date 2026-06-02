@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AppShell } from '@/components/layout/app-shell'
 import { Toaster } from '@/components/ui/toaster'
+import { cookies } from 'next/headers'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,11 +22,18 @@ export const metadata: Metadata = {
   description: 'Controle financeiro de Jacson e Manueli',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies()
+  const usuario = cookieStore.get('casal_user')?.value ?? null
+
   return (
     <html lang="pt-BR" className="dark">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
-        <AppShell>{children}</AppShell>
+        {usuario ? (
+          <AppShell usuario={usuario}>{children}</AppShell>
+        ) : (
+          children
+        )}
         <Toaster />
       </body>
     </html>
