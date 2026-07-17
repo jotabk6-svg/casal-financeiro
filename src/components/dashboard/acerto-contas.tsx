@@ -17,6 +17,11 @@ export function AcertoContasCard({ acerto }: AcertoContasCardProps) {
   const percJacson = (jacson / total) * 100
   const percManueli = (manueli / total) * 100
 
+  const chartGradient = `conic-gradient(
+    ${isJacsonPaga ? '#3b82f6' : '#ec4899'} 0% ${percJacson}%,
+    ${isJacsonPaga ? '#ec4899' : '#3b82f6'} ${percJacson}% 100%
+  )`
+
   return (
     <div className="rounded-2xl bg-white p-4 shadow-sm border border-zinc-200">
       <div className="flex items-center gap-3 mb-4">
@@ -24,36 +29,58 @@ export function AcertoContasCard({ acerto }: AcertoContasCardProps) {
           <Scale className="h-5 w-5 text-slate-700" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-900">Balanço do Mês</p>
-          <p className="text-xs text-slate-500">Para equilibrar as despesas compartilhadas, a compensação sugerida é:</p>
+          <p className="text-sm font-semibold text-slate-900">Diferença de gastos mensais</p>
+          <p className="text-xs text-slate-500">Visualize o equilíbrio de gastos e quanto Jacson gasta a mais.</p>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-slate-50 p-4 mb-4 border border-slate-100">
-        <p className="text-sm text-slate-500">Transferência sugerida</p>
-        <p className="mt-2 text-2xl font-semibold text-slate-900">{formatCurrency(valor)}</p>
-        <p className="mt-2 text-sm text-slate-500">
-          <span className={isJacsonPaga ? 'text-blue-600 font-semibold' : 'text-pink-600 font-semibold'}>{nomeQuemPaga}</span>
-          {' → '}
-          <span className={isJacsonPaga ? 'text-pink-600 font-semibold' : 'text-blue-600 font-semibold'}>{nomeQuemRecebe}</span>
-        </p>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-          <span>Jacson</span>
-          <span>{percJacson.toFixed(0)}%</span>
-        </div>
-        <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-          <div className="h-full rounded-full bg-blue-500" style={{ width: `${percJacson}%` }} />
+      <div className="grid gap-4 md:grid-cols-[auto_1fr] items-center">
+        <div className="relative mx-auto h-44 w-44">
+          <div
+            className="absolute inset-0 rounded-full bg-slate-100"
+            style={{ background: chartGradient }}
+          />
+          <div className="absolute inset-4 rounded-full bg-white shadow-sm flex flex-col items-center justify-center text-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Quanto Jacson gasta a mais</p>
+            <p className="mt-2 text-3xl font-semibold text-slate-900">{formatCurrency(valor)}</p>
+            <p className="mt-1 text-xs text-slate-500">Jacson paga mais do que Manueli</p>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-          <span>Manueli</span>
-          <span>{percManueli.toFixed(0)}%</span>
-        </div>
-        <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-          <div className="h-full rounded-full bg-pink-500" style={{ width: `${percManueli}%` }} />
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+            <p className="text-sm font-medium text-slate-700">Percentual de participação</p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                  <span className="text-sm font-medium text-slate-700">Jacson</span>
+                </div>
+                <span className="text-sm font-semibold text-slate-900">{percJacson.toFixed(0)}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full rounded-full bg-blue-500" style={{ width: `${percJacson}%` }} />
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-pink-500" />
+                  <span className="text-sm font-medium text-slate-700">Manueli</span>
+                </div>
+                <span className="text-sm font-semibold text-slate-900">{percManueli.toFixed(0)}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full rounded-full bg-pink-500" style={{ width: `${percManueli}%` }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+            <p className="text-sm font-medium text-slate-700">Contexto do mês</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Este valor é o ajuste necessário para que ambos compartilhem as despesas de forma equilibrada.
+            </p>
+          </div>
         </div>
       </div>
     </div>
