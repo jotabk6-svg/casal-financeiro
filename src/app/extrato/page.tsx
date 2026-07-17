@@ -5,7 +5,7 @@ import { TransacoesList } from '@/components/extrato/transacoes-list'
 import type { Transacao } from '@/types'
 
 interface PageProps {
-  searchParams: Promise<{ month?: string; year?: string; tipo?: string; usuario?: string; categoria?: string }>
+  searchParams: Promise<{ month?: string; year?: string; tipo?: string; usuario?: string; categoria?: string; busca?: string }>
 }
 
 function UserBadge({ usuario }: { usuario: string }) {
@@ -30,6 +30,12 @@ export default async function ExtratoPage({ searchParams }: PageProps) {
   if (params.tipo && params.tipo !== 'TODOS') where.tipo = params.tipo
   if (params.usuario && params.usuario !== 'TODOS') where.usuario = params.usuario
   if (params.categoria && params.categoria !== 'TODOS') where.categoria = params.categoria
+  if (params.busca) {
+    where.OR = [
+      { descricao: { contains: params.busca, mode: 'insensitive' } },
+      { categoria: { contains: params.busca, mode: 'insensitive' } },
+    ]
+  }
 
   const rows = await prisma.transacao.findMany({
     where,
@@ -77,18 +83,29 @@ export default async function ExtratoPage({ searchParams }: PageProps) {
         <MonthSelector year={year} month={month} />
       </div>
 
-      <div className="grid gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:grid-cols-[minmax(0,1.5fr)_auto]">
-        <form method="get" className="space-y-3 sm:space-y-0 sm:flex sm:items-end sm:gap-3 w-full">
+      <div className="rounded-2xl bg-white p-3 shadow-sm border border-zinc-200">
+        <form method="get" className="grid gap-2 sm:grid-cols-[1.4fr_1.5fr_1fr_auto] sm:items-end">
           <input type="hidden" name="year" value={String(year)} />
           <input type="hidden" name="month" value={String(month)} />
           {params.usuario && params.usuario !== 'TODOS' && <input type="hidden" name="usuario" value={params.usuario} />}
 
-          <div className="flex-1">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Tipo</label>
+          <div>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar</label>
+            <input
+              type="text"
+              name="busca"
+              defaultValue={params.busca ?? ''}
+              placeholder="Descrição, categoria..."
+              className="mt-1 w-full rounded-lg border border-zinc-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Tipo</label>
             <select
               name="tipo"
               defaultValue={params.tipo ?? 'TODOS'}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+              className="mt-1 w-full rounded-lg border border-zinc-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
             >
               <option value="TODOS">Todos</option>
               <option value="DESPESA">Despesas</option>
@@ -96,12 +113,12 @@ export default async function ExtratoPage({ searchParams }: PageProps) {
             </select>
           </div>
 
-          <div className="flex-1">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Categoria</label>
+          <div>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Categoria</label>
             <select
               name="categoria"
               defaultValue={params.categoria ?? 'TODOS'}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+              className="mt-1 w-full rounded-lg border border-zinc-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
             >
               <option value="TODOS">Todas</option>
               {allCategorias.map((categoria) => (
@@ -110,22 +127,21 @@ export default async function ExtratoPage({ searchParams }: PageProps) {
             </select>
           </div>
 
-          <button
-            type="submit"
-            className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
-          >
-            Filtrar
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="min-w-[100px] rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+            >
+              Filtrar
+            </button>
+            <a
+              href={clearFiltersHref}
+              className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-100"
+            >
+              Limpar
+            </a>
+          </div>
         </form>
-
-        <div className="flex items-center justify-end">
-          <a
-            href={clearFiltersHref}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-100"
-          >
-            Limpar filtro
-          </a>
-        </div>
       </div>
 
       {/* Mini summary */}

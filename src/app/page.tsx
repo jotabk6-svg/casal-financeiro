@@ -5,6 +5,7 @@ import { CashflowChart } from '@/components/dashboard/cashflow-chart'
 import { ActivityFeed } from '@/components/dashboard/activity-feed'
 import { AcertoContasCard } from '@/components/dashboard/acerto-contas'
 import { MetasCard } from '@/components/dashboard/metas-card'
+import { CategoriaDistribuicao } from '@/components/dashboard/categoria-distribuicao'
 import { MonthSelector } from '@/components/month-selector'
 import type { Transacao, Meta, MesData } from '@/types'
 
@@ -91,17 +92,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         saldo={saldo}
       />
 
-      {/* Cashflow chart */}
-      <CashflowChart meses={mesesData} />
+      {/* Main grid */}
+      <div className="grid gap-6 lg:grid-cols-[1.75fr_1fr]">
+        <div className="space-y-6">
+          <CashflowChart meses={mesesData} />
+          <ActivityFeed transacoes={transacoes.slice(0, 8)} />
+        </div>
 
-      {/* Acerto de Contas + Metas */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AcertoContasCard acerto={acerto} />
-        <MetasCard metas={metas} />
+        <div className="space-y-6">
+          <AcertoContasCard acerto={acerto} />
+          <CategoriaDistribuicao transacoes={transacoes} />
+          <MetasCard metas={metas} />
+        </div>
       </div>
-
-      {/* Activity feed */}
-      <ActivityFeed transacoes={transacoes.slice(0, 10)} />
     </div>
   )
 }
